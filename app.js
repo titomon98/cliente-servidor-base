@@ -1,26 +1,20 @@
 const express = require('express');
 require('dotenv').config();
-const autorRouter = require('./routes/autor.routes')
-const generoRouter = require('./routes/generos.routes')
 
-const app = express();
-app.use(express.json());
+const sequelize = require('./db/db')
+const autorRoutes = require('./routes/autor.routes')
+const AutorModel = require('./models/autor.model')
 
-// Ruta base para que no se quede vacia
-app.get('/', (req, res) => {
-  const mensaje = {
-    base: "Hola mundo",
-    codigo: 200,
-    clase: "6A_S"
-  }
-  res.send({mensajeBase: mensaje});
-});
+const app = express()
+app.use(express.json())
 
-//Mandar a traer las rutas de autores
-app.use('/', autorRouter)
-app.use('/', generoRouter)
+//Maquetar las rutas
+app.use('/', autorRoutes)
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Servidor corriendo en puerto ${PORT}`);
-});
+sequelize.sync().then(() => {
+  app.listen(3000, () => {
+    console.log('Base de datos conectada')
+  })
+}).catch(err => {
+  console.error('Error al conectar la base de datos', err)
+})
